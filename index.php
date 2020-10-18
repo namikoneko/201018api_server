@@ -19,6 +19,60 @@ Flight::route('/post', function(){
     echo $arr;
 });
 
+// find_thread ##################################################
+Flight::route('/findthreadtext', function(){
+    $findtext= Flight::request()->data->findtext;
+    $rows = ORM::for_table('thread')->where_like('text',"%" . $findtext . "%")->find_many();
+    $i = 0;
+    foreach($rows as $row){
+        $list[$i]["id"] = $row["id"];
+        $list[$i]["title"] = $row["title"];
+        $list[$i]["text"] = $row["text"];
+        $i++;
+    }
+    header("Content-Type: application/json; charset=utf-8");
+//    try{
+//      $arr = Flight::json($list);
+//    }catch(Exception $e){
+//        $list[0]["id"] = 999;
+//        $list[0]["title"] = "not existed";
+//        $list[0]["text"] = "not existed";
+//      $arr = Flight::json($list);
+//    }
+      $arr = Flight::json($list);
+    echo $arr;
+});
+
+// result_thread ##################################################
+Flight::route('/resultthread/@id', function($id){
+    $rows = ORM::for_table('thread')->where("id",$id)->find_many();
+    $i = 0;
+    foreach($rows as $row){
+        $list[$i]["id"] = $row["id"];
+        $list[$i]["title"] = $row["title"];
+        $list[$i]["text"] = $row["text"];
+        $i++;
+        $rowsA = ORM::for_table('map')->where('threadid', $row->id)->find_many();
+        $j = 0;
+        $postid = array();
+        foreach($rowsA as $rowA){
+            $postid[$j] = $rowA->postid;
+            $j++;
+        }
+        $rowsB = ORM::for_table('post')->where_in("id",$postid)->find_many();
+        $k = 0;
+        foreach($rowsB as $rowB){
+            $list[$i]["post"][$k]["id"] = $rowB->id;
+            $list[$i]["post"][$k]["title"] = $rowB->title;
+            $k++;
+        }
+        $i++;
+    }
+    header("Content-Type: application/json; charset=utf-8");
+    $arr = Flight::json($list);
+    echo $arr;
+});
+
 // post_thread ##################################################
 Flight::route('/post/@id', function($id){
     $row = ORM::for_table('post')->find_one($id);
