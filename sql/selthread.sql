@@ -1,1 +1,1 @@
-select * from thread;
+select * from thread where title='a';

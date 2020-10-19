@@ -1,1 +1,2 @@
-drop table map;
+drop table foo;
+drop table bar;
